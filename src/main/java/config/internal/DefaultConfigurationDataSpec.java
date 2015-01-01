@@ -56,6 +56,12 @@ public class DefaultConfigurationDataSpec implements ConfigurationDataSpec {
     }
 
     @Override
+    public ConfigurationDataSpec props(Path path) {
+        add(new PropertiesConfigurationSource(objectMapper, path));
+        return this;
+    }
+
+    @Override
     public ConfigurationDataSpec yaml(Path path) {
         add(new YamlConfigurationSource(objectMapper, path));
         return this;
