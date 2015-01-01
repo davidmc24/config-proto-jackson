@@ -31,7 +31,7 @@ public interface ConfigurationDataSpec {
 //
 //    ConfigurationDataSpec sysProps();
 //
-//    ConfigurationDataSpec yaml(Path path);
-//
+    ConfigurationDataSpec yaml(Path path);
+
 //    ConfigurationDataSpec yaml(URL url);
 }

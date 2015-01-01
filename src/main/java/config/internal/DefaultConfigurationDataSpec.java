@@ -55,6 +55,12 @@ public class DefaultConfigurationDataSpec implements ConfigurationDataSpec {
         return this;
     }
 
+    @Override
+    public ConfigurationDataSpec yaml(Path path) {
+        add(new YamlConfigurationSource(objectMapper, path));
+        return this;
+    }
+
     private static ObjectMapper newDefaultObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new GuavaModule());

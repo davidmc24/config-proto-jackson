@@ -7,17 +7,13 @@ import com.fasterxml.jackson.databind.node.TreeTraversingParser;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import config.ConfigurationData;
 import config.ConfigurationSource;
-import ratpack.launch.ServerConfig;
 
 import java.io.IOException;
 import java.util.Iterator;
 
 public class DefaultConfigurationData implements ConfigurationData {
-    // TODO: cleanup
-    private static final ImmutableMap CLASS_SUBSTITUTIONS = ImmutableMap.of(); //  ImmutableMap.of(ServerConfig.class, AnnotatedDefaultServerConfig.class);
     private final ObjectMapper objectMapper;
     private final ObjectNode rootNode;
 
@@ -31,9 +27,8 @@ public class DefaultConfigurationData implements ConfigurationData {
 
     @Override
     public <O> O get(Class<O> type) {
-        Class<? extends O> actualType = determineType(Preconditions.checkNotNull(type));
         try {
-            return objectMapper.readValue(new TreeTraversingParser(rootNode, objectMapper), actualType);
+            return objectMapper.readValue(new TreeTraversingParser(rootNode, objectMapper), Preconditions.checkNotNull(type));
         } catch (IOException ex) {
             throw Throwables.propagate(ex);
         }
@@ -54,10 +49,5 @@ public class DefaultConfigurationData implements ConfigurationData {
                 ((ObjectNode) destNode).replace(fieldName, sourceFieldValue);
             }
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    private <O> Class<? extends O> determineType(Class<O> type) {
-        return (Class<? extends O>) CLASS_SUBSTITUTIONS.getOrDefault(type, type);
     }
 }
