@@ -2,7 +2,6 @@ package config.internal;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.google.common.base.Preconditions;
@@ -13,7 +12,9 @@ import config.ConfigurationDataSpec;
 import config.ConfigurationSource;
 import ratpack.func.Action;
 
+import java.net.URL;
 import java.nio.file.Path;
+import java.util.Properties;
 
 public class DefaultConfigurationDataSpec implements ConfigurationDataSpec {
     private final ObjectMapper objectMapper;
@@ -56,14 +57,46 @@ public class DefaultConfigurationDataSpec implements ConfigurationDataSpec {
     }
 
     @Override
+    public ConfigurationDataSpec json(URL url) {
+        add(new JsonConfigurationSource(objectMapper, url));
+        return this;
+    }
+
+    // TODO: support specifying a prefix?
+    @Override
     public ConfigurationDataSpec props(Path path) {
         add(new PropertiesConfigurationSource(objectMapper, path));
         return this;
     }
 
     @Override
+    public ConfigurationDataSpec props(Properties properties) {
+        add(new PropertiesConfigurationSource(objectMapper, null, properties));
+        return this;
+    }
+
+    @Override
+    public ConfigurationDataSpec props(URL url) {
+        add(new PropertiesConfigurationSource(objectMapper, url));
+        return this;
+    }
+
+    // TODO: support specifying a prefix?
+    @Override
+    public ConfigurationDataSpec sysProps() {
+        add(new SystemPropertiesConfigurationSource(objectMapper));
+        return this;
+    }
+
+    @Override
     public ConfigurationDataSpec yaml(Path path) {
         add(new YamlConfigurationSource(objectMapper, path));
+        return this;
+    }
+
+    @Override
+    public ConfigurationDataSpec yaml(URL url) {
+        add(new YamlConfigurationSource(objectMapper, url));
         return this;
     }
 

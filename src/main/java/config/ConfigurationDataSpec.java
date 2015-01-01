@@ -19,19 +19,21 @@ public interface ConfigurationDataSpec {
 
 //    ConfigurationDataSpec env();
 
+    // TODO: consider adding support for ByteSource arguments
+
     ConfigurationDataSpec json(Path path);
 
-//    ConfigurationDataSpec json(URL url);
-//
+    ConfigurationDataSpec json(URL url);
+
     ConfigurationDataSpec props(Path path);
 
-//    ConfigurationDataSpec props(Properties properties);
-//
-//    ConfigurationDataSpec props(URL url);
-//
-//    ConfigurationDataSpec sysProps();
-//
+    ConfigurationDataSpec props(Properties properties);
+
+    ConfigurationDataSpec props(URL url);
+
+    ConfigurationDataSpec sysProps();
+
     ConfigurationDataSpec yaml(Path path);
 
-//    ConfigurationDataSpec yaml(URL url);
+    ConfigurationDataSpec yaml(URL url);
 }

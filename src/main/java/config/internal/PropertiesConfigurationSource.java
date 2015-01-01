@@ -1,11 +1,12 @@
 package config.internal;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
@@ -23,13 +24,20 @@ public class PropertiesConfigurationSource implements ConfigurationSource {
     private final ObjectMapper objectMapper;
     private final ObjectNode node;
 
-    public PropertiesConfigurationSource(ObjectMapper objectMapper, Properties properties) {
+    public PropertiesConfigurationSource(ObjectMapper objectMapper, String prefix, Properties properties) {
         this.objectMapper = objectMapper;
         this.node = objectMapper.createObjectNode();
         Splitter splitter = Splitter.on(".");
-        for (String key : properties.stringPropertyNames()) {
+        boolean hasPrefix = !Strings.isNullOrEmpty(prefix);
+        Iterable<String> keyNames = properties.stringPropertyNames();
+        if (hasPrefix) {
+            keyNames = FluentIterable.from(keyNames)
+                    .filter(key -> key.startsWith(prefix))
+                    .transform(key -> key.substring(prefix.length(), key.length()));
+        }
+        for (String key : keyNames) {
             List<String> keyParts = splitter.splitToList(key);
-            String value = properties.getProperty(key);
+            String value = properties.getProperty(hasPrefix ? prefix + key : key);
             putValue(keyParts, value, node);
         }
         // TODO: pull in richer impl from https://github.com/danveloper/config-binding/blob/master/src/main/java/config/PropertiesConfigurationSource.java
@@ -49,12 +57,16 @@ public class PropertiesConfigurationSource implements ConfigurationSource {
         }
     }
 
+    public PropertiesConfigurationSource(ObjectMapper objectMapper, String prefix, ByteSource byteSource) {
+        this(objectMapper, prefix, load(byteSource));
+    }
+
     public PropertiesConfigurationSource(ObjectMapper objectMapper, URL url) {
-        this(objectMapper, load(Resources.asByteSource(url)));
+        this(objectMapper, null, Resources.asByteSource(url));
     }
 
     public PropertiesConfigurationSource(ObjectMapper objectMapper, Path path) {
-        this(objectMapper, load(Files.asByteSource(path.toFile())));
+        this(objectMapper, null, Files.asByteSource(path.toFile()));
     }
 
     @Override
