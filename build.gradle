@@ -1,0 +1,33 @@
+apply plugin: "groovy"
+apply plugin: "idea"
+
+repositories {
+    mavenLocal()
+    jcenter()
+}
+
+dependencies {
+    def jacksonVersion = "2.4.4"
+    compile "io.ratpack:ratpack-core:0.9.12-SNAPSHOT"
+    compile "io.ratpack:ratpack-hikari:0.9.12-SNAPSHOT"
+    testCompile "org.codehaus.groovy:groovy-all:2.3.6"
+    testCompile "org.spockframework:spock-core:0.7-groovy-2.0"
+    //compile "javax.validation:validation-api:1.1.0.Final"
+    compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    compile "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-guava:${jacksonVersion}"
+    compile "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
+}
+
+idea {
+    project {
+        jdkName "1.8"
+        languageLevel "1.8"
+        ipr {
+            withXml { provider ->
+                def node = provider.asNode()
+                node.component.find { it.'@name' == 'VcsDirectoryMappings' }?.mapping[0].'@vcs' = 'Git'
+            }
+        }
+    }
+}
