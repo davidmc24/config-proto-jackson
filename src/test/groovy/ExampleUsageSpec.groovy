@@ -1,6 +1,5 @@
 import config.Configurations
 import config.internal.EnvironmentVariablesConfigurationSource
-import jdk.nashorn.internal.runtime.regexp.joni.Config
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import ratpack.launch.ServerConfig
@@ -8,7 +7,6 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.security.KeyStore
 
 class ExampleUsageSpec extends Specification {
@@ -261,6 +259,7 @@ other.b: 2
         def baseDir = tempFolder.newFolder("baseDir").toPath()
         def keyStoreFile = tempFolder.newFile("keystore.jks").toPath()
         def keyStorePassword = "changeit"
+        createKeystore(keyStoreFile, keyStorePassword)
         def configFile = tempFolder.newFile("file.yaml").toPath()
         configFile.text =
 """
@@ -289,7 +288,6 @@ other:
     b: "2"
 ...
 """
-        createKeystore(keyStoreFile, keyStorePassword)
 
         when:
         def serverConfig = Configurations.config().yaml(configFile).build().get(ServerConfig)
@@ -313,6 +311,29 @@ other:
         serverConfig.getOtherPrefixedWith("") == [a:"1", b:"2"]
     }
 
+    def "can combine configuration from multiple sources"() {
+        def jsonFile = tempFolder.newFile("file.json").toPath()
+        jsonFile.text = '{"port": 8080}'
+        def propsFile = tempFolder.newFile("file.properties").toPath()
+        propsFile.text = 'development=true'
+        def yamlFile = tempFolder.newFile("file.yaml").toPath()
+        yamlFile.text = 'publicAddress: http://localhost:8080'
+        System.setProperty("ratpack.threads", "3")
+        def envData = [ratpack_address: "localhost"]
+
+        when:
+        def envSource = new EnvironmentVariablesConfigurationSource(EnvironmentVariablesConfigurationSource.DEFAULT_PREFIX, envData)
+        def serverConfig = Configurations.config().json(jsonFile).yaml(yamlFile).props(propsFile).add(envSource).sysProps().build().get(ServerConfig)
+
+        then:
+        serverConfig.port == 8080
+        serverConfig.address == InetAddress.getByName("localhost")
+        serverConfig.development
+        serverConfig.threads == 3
+        serverConfig.publicAddress == URI.create("http://localhost:8080")
+        serverConfig.maxContentLength == ServerConfig.DEFAULT_MAX_CONTENT_LENGTH
+    }
+
 //    def "basic usage"() {
 //        def configurationSource = Configurations.add(props("file.properties")).add(yaml("file.yaml")).add(json("file.json")).env().sysProps()
 //        def serverConfig = configurationSource.get(ServerConfig)
@@ -322,15 +343,6 @@ other:
 //    def "Supports getting config objects from subpaths"() {
 //        def configurationSource = Configurations.add(props("file.properties")).add(yaml("file.yaml")).add(json("file.json")).env().sysProps()
 //        def serverConfig = config
-//    }
-//
-//    def "supports various input sources"() {
-//        // Configurations.add(props("file.properties")).add(yaml("file.yaml")).add(json("file.json")).env().sysProps()
-//        // TODO
-//    }
-//
-//    def "can add custom configuration sources"() {
-//        // TODO
 //    }
 //
 //    def "source overriding"() {
