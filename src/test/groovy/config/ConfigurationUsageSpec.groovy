@@ -67,4 +67,22 @@ hikari:
         serverConfig.port == 7654
         hikariConfig.jdbcUrl == "jdbc:h2:mem:"
     }
+
+    def "when a value is present in multiple sources, the last source wins"() {
+        def jsonFile = tempFolder.newFile("file.json").toPath()
+        jsonFile.text = '{"port": 123}'
+        def propsFile = tempFolder.newFile("file.properties").toPath()
+        propsFile.text = 'port=345'
+        def yamlFile = tempFolder.newFile("file.yaml").toPath()
+        yamlFile.text = 'port: 234'
+        System.setProperty("ratpack.port", "567")
+        def envData = [ratpack_port: "456"]
+
+        when:
+        def envSource = new EnvironmentVariablesConfigurationSource(EnvironmentVariablesConfigurationSource.DEFAULT_PREFIX, envData)
+        def serverConfig = Configurations.config().json(jsonFile).yaml(yamlFile).props(propsFile).add(envSource).sysProps().build().get(ServerConfig)
+
+        then:
+        serverConfig.port == 567
+    }
 }

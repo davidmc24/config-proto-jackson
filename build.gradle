@@ -14,6 +14,7 @@ dependencies {
     compile "io.ratpack:ratpack-hikari:${ratpackVersion}"
     testCompile "org.codehaus.groovy:groovy-all:2.3.6"
     testCompile "org.spockframework:spock-core:0.7-groovy-2.0"
+    testRuntime "org.slf4j:slf4j-simple:1.7.9"
     //compile "javax.validation:validation-api:1.1.0.Final"
     compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     compile "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
