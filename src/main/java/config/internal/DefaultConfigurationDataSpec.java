@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import config.ConfigurationData;
 import config.ConfigurationDataSpec;
@@ -26,12 +24,11 @@ public class DefaultConfigurationDataSpec implements ConfigurationDataSpec {
     }
 
     public DefaultConfigurationDataSpec(ObjectMapper objectMapper) {
-        this.objectMapper = Preconditions.checkNotNull(objectMapper);
+        this.objectMapper = objectMapper;
     }
 
     @Override
     public ConfigurationDataSpec add(ConfigurationSource configurationSource) {
-        Preconditions.checkNotNull(configurationSource);
         sources.add(configurationSource);
         return this;
     }
@@ -52,52 +49,58 @@ public class DefaultConfigurationDataSpec implements ConfigurationDataSpec {
     }
 
     @Override
+    public ConfigurationDataSpec env() {
+        add(new EnvironmentVariablesConfigurationSource());
+        return this;
+    }
+
+    @Override
     public ConfigurationDataSpec json(Path path) {
-        add(new JsonConfigurationSource(objectMapper, path));
+        add(new JsonConfigurationSource(path));
         return this;
     }
 
     @Override
     public ConfigurationDataSpec json(URL url) {
-        add(new JsonConfigurationSource(objectMapper, url));
+        add(new JsonConfigurationSource(url));
         return this;
     }
 
     // TODO: support specifying a prefix?
     @Override
     public ConfigurationDataSpec props(Path path) {
-        add(new PropertiesConfigurationSource(objectMapper, path));
+        add(new PropertiesConfigurationSource(path));
         return this;
     }
 
     @Override
     public ConfigurationDataSpec props(Properties properties) {
-        add(new PropertiesConfigurationSource(objectMapper, null, properties));
+        add(new PropertiesConfigurationSource(null, properties));
         return this;
     }
 
     @Override
     public ConfigurationDataSpec props(URL url) {
-        add(new PropertiesConfigurationSource(objectMapper, url));
+        add(new PropertiesConfigurationSource(url));
         return this;
     }
 
     // TODO: support specifying a prefix?
     @Override
     public ConfigurationDataSpec sysProps() {
-        add(new SystemPropertiesConfigurationSource(objectMapper));
+        add(new SystemPropertiesConfigurationSource());
         return this;
     }
 
     @Override
     public ConfigurationDataSpec yaml(Path path) {
-        add(new YamlConfigurationSource(objectMapper, path));
+        add(new YamlConfigurationSource(path));
         return this;
     }
 
     @Override
     public ConfigurationDataSpec yaml(URL url) {
-        add(new YamlConfigurationSource(objectMapper, url));
+        add(new YamlConfigurationSource(url));
         return this;
     }
 

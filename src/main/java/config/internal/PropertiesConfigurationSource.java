@@ -1,6 +1,5 @@
 package config.internal;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterables;
 import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
@@ -18,22 +17,22 @@ import java.util.Properties;
 public class PropertiesConfigurationSource extends FlatToNestedConfigurationSource {
     private final Properties properties;
 
-    public PropertiesConfigurationSource(ObjectMapper objectMapper, String prefix, Properties properties) {
-        super(objectMapper, prefix);
+    public PropertiesConfigurationSource(String prefix, Properties properties) {
+        super(prefix);
         this.properties = properties;
         // TODO: pull in richer impl from https://github.com/danveloper/config-binding/blob/master/src/main/java/config/PropertiesConfigurationSource.java
     }
 
-    public PropertiesConfigurationSource(ObjectMapper objectMapper, String prefix, ByteSource byteSource) {
-        this(objectMapper, prefix, load(byteSource));
+    public PropertiesConfigurationSource(String prefix, ByteSource byteSource) {
+        this(prefix, load(byteSource));
     }
 
-    public PropertiesConfigurationSource(ObjectMapper objectMapper, URL url) {
-        this(objectMapper, null, Resources.asByteSource(url));
+    public PropertiesConfigurationSource(URL url) {
+        this(null, Resources.asByteSource(url));
     }
 
-    public PropertiesConfigurationSource(ObjectMapper objectMapper, Path path) {
-        this(objectMapper, null, Files.asByteSource(path.toFile()));
+    public PropertiesConfigurationSource(Path path) {
+        this(null, Files.asByteSource(path.toFile()));
     }
 
     @Override

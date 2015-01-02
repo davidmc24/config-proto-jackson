@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TreeTraversingParser;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import config.ConfigurationData;
 import config.ConfigurationSource;
@@ -22,14 +20,14 @@ public class DefaultConfigurationData implements ConfigurationData {
         this.objectMapper = objectMapper;
         rootNode = objectMapper.createObjectNode();
         for (ConfigurationSource source : configurationSources) {
-            merge(source.loadConfigurationData(), rootNode);
+            merge(source.loadConfigurationData(objectMapper), rootNode);
         }
     }
 
     @Override
     public <O> O get(Class<O> type) {
         try {
-            return objectMapper.readValue(new TreeTraversingParser(rootNode, objectMapper), Preconditions.checkNotNull(type));
+            return objectMapper.readValue(new TreeTraversingParser(rootNode, objectMapper), type);
         } catch (IOException ex) {
             throw ExceptionUtils.uncheck(ex);
         }

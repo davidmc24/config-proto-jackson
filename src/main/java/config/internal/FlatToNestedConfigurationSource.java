@@ -19,16 +19,14 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public abstract class FlatToNestedConfigurationSource implements ConfigurationSource {
-    private final ObjectMapper objectMapper;
     private final String prefix;
 
-    public FlatToNestedConfigurationSource(ObjectMapper objectMapper, @Nullable String prefix) {
-        this.objectMapper = objectMapper;
+    public FlatToNestedConfigurationSource(@Nullable String prefix) {
         this.prefix = prefix;
         // TODO: pull in richer impl from https://github.com/danveloper/config-binding/blob/master/src/main/java/config/PropertiesConfigurationSource.java
     }
 
-    private void putValue(Iterable<String> keyParts, String value, ObjectNode node) {
+    private void putValue(ObjectMapper objectMapper, Iterable<String> keyParts, String value, ObjectNode node) {
         String curPart = Iterables.getFirst(keyParts, null);
         if (Iterables.size(keyParts) == 1) {
             node.set(curPart, TextNode.valueOf(value));
@@ -38,18 +36,18 @@ public abstract class FlatToNestedConfigurationSource implements ConfigurationSo
                 childNode = objectMapper.createObjectNode();
                 node.set(curPart, childNode);
             }
-            putValue(Iterables.skip(keyParts, 1), value, childNode);
+            putValue(objectMapper, Iterables.skip(keyParts, 1), value, childNode);
         }
     }
 
     @Override
-    public ObjectNode loadConfigurationData() {
+    public ObjectNode loadConfigurationData(ObjectMapper objectMapper) {
         try {
             Function<String, Iterable<String>> keyTokenizer = getKeyTokenizer();
             ObjectNode rootNode = objectMapper.createObjectNode();
             for (Pair<String, String> entry : transformData().apply(loadRawData())) {
                 Iterable<String> keyParts = keyTokenizer.apply(entry.left);
-                putValue(keyParts, entry.right, rootNode);
+                putValue(objectMapper, keyParts, entry.right, rootNode);
             }
             return rootNode;
         } catch (Exception ex) {

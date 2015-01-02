@@ -17,7 +17,7 @@ public interface ConfigurationDataSpec {
 
     ConfigurationData build();
 
-//    ConfigurationDataSpec env();
+    ConfigurationDataSpec env();
 
     // TODO: consider adding support for ByteSource arguments
 
