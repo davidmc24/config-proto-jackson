@@ -2,14 +2,16 @@ apply plugin: "groovy"
 apply plugin: "idea"
 
 repositories {
-    mavenLocal()
+    maven { url "http://oss.jfrog.org/artifactory/repo" }
+//    mavenLocal()
     jcenter()
 }
 
 dependencies {
+    def ratpackVersion = "0.9.13-SNAPSHOT"
     def jacksonVersion = "2.4.4"
-    compile "io.ratpack:ratpack-core:0.9.12-SNAPSHOT"
-    compile "io.ratpack:ratpack-hikari:0.9.12-SNAPSHOT"
+    compile "io.ratpack:ratpack-core:${ratpackVersion}"
+    compile "io.ratpack:ratpack-hikari:${ratpackVersion}"
     testCompile "org.codehaus.groovy:groovy-all:2.3.6"
     testCompile "org.spockframework:spock-core:0.7-groovy-2.0"
     //compile "javax.validation:validation-api:1.1.0.Final"
