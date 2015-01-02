@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Throwables;
 import config.ConfigurationSource;
+import ratpack.util.ExceptionUtils;
 
 import java.io.IOException;
 import java.net.URL;
@@ -20,7 +21,7 @@ public abstract class JacksonConfigurationSource implements ConfigurationSource 
         try {
             parser = getFactory().createParser(path.toFile());
         } catch (IOException ex) {
-            throw Throwables.propagate(ex);
+            throw ExceptionUtils.uncheck(ex);
         }
     }
 
@@ -29,7 +30,7 @@ public abstract class JacksonConfigurationSource implements ConfigurationSource 
         try {
             parser = getFactory().createParser(url);
         } catch (IOException ex) {
-            throw Throwables.propagate(ex);
+            throw ExceptionUtils.uncheck(ex);
         }
     }
 
@@ -38,9 +39,8 @@ public abstract class JacksonConfigurationSource implements ConfigurationSource 
         try {
             return objectMapper.readTree(parser);
         } catch (IOException ex) {
-            throw Throwables.propagate(ex);
+            throw ExceptionUtils.uncheck(ex);
         }
-
     }
 
     protected ObjectMapper getObjectMapper() {

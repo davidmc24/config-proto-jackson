@@ -9,6 +9,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import config.ConfigurationData;
 import config.ConfigurationSource;
+import ratpack.util.ExceptionUtils;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -30,7 +31,7 @@ public class DefaultConfigurationData implements ConfigurationData {
         try {
             return objectMapper.readValue(new TreeTraversingParser(rootNode, objectMapper), Preconditions.checkNotNull(type));
         } catch (IOException ex) {
-            throw Throwables.propagate(ex);
+            throw ExceptionUtils.uncheck(ex);
         }
     }
 

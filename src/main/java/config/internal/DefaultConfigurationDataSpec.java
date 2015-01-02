@@ -11,6 +11,7 @@ import config.ConfigurationData;
 import config.ConfigurationDataSpec;
 import config.ConfigurationSource;
 import ratpack.func.Action;
+import ratpack.util.ExceptionUtils;
 
 import java.net.URL;
 import java.nio.file.Path;
@@ -45,7 +46,7 @@ public class DefaultConfigurationDataSpec implements ConfigurationDataSpec {
         try {
             action.execute(objectMapper);
         } catch (Exception ex) {
-            throw Throwables.propagate(ex);
+            throw ExceptionUtils.uncheck(ex);
         }
         return this;
     }
