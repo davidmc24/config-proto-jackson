@@ -1,5 +1,6 @@
 package config
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.zaxxer.hikari.HikariConfig
 import config.internal.EnvironmentVariablesConfigurationSource
 import ratpack.launch.ServerConfig
@@ -84,5 +85,22 @@ hikari:
 
         then:
         serverConfig.port == 567
+    }
+
+    def "can get raw data as node structure"() {
+        System.setProperty("ratpack.server.port", "6543")
+        def yamlFile = tempFolder.newFile("file.yaml").toPath()
+yamlFile.text = """
+server:
+    port: 7654
+hikari:
+    jdbcUrl: "jdbc:h2:mem:"
+"""
+        when:
+        def config = Configurations.config().yaml(yamlFile).sysProps().build()
+        def node = config.get(JsonNode)
+
+        then:
+        node.toString() == '{"server":{"port":"6543"},"hikari":{"jdbcUrl":"jdbc:h2:mem:"}}'
     }
 }
