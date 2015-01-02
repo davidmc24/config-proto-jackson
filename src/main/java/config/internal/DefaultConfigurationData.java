@@ -25,9 +25,10 @@ public class DefaultConfigurationData implements ConfigurationData {
     }
 
     @Override
-    public <O> O get(Class<O> type) {
+    public <O> O get(String pointer, Class<O> type) {
+        ObjectNode curNode = pointer != null ? (ObjectNode) rootNode.at(pointer) : rootNode;
         try {
-            return objectMapper.readValue(new TreeTraversingParser(rootNode, objectMapper), type);
+            return objectMapper.readValue(new TreeTraversingParser(curNode, objectMapper), type);
         } catch (IOException ex) {
             throw ExceptionUtils.uncheck(ex);
         }

@@ -1,11 +1,8 @@
 package config;
 
-import com.google.common.reflect.TypeToken;
-
 public interface ConfigurationData {
-    <O> O get(Class<O> type);
-
-//    <O> O get(TypeToken<O> type) throws ConfigurationException;
-
-    // TODO: more?
+    <O> O get(String pointer, Class<O> type);
+    default <O> O get(Class<O> type) {
+        return get(null, type);
+    }
 }
